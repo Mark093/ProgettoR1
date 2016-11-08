@@ -96,7 +96,7 @@ public class TitlesHandler extends DefaultHandler {
                         headers.printHeaders();
                         //parse the pages with the old set
                         for (Document page : docChecked) {
-                            HTMLParser hparser = new HTMLParser(page);
+                            HTMLParser hparser = new HTMLParser(page, headers);
                         }
                         docChecked=docToCheck;
                         docToCheck=new ArrayList<>(refresh_freq);
@@ -115,10 +115,10 @@ public class TitlesHandler extends DefaultHandler {
     @Override
     public void endDocument() throws SAXException {
         for (Document page : docChecked) {
-            HTMLParser hparser = new HTMLParser(page);
+            HTMLParser hparser = new HTMLParser(page, headers);
         }
         for (Document page : docToCheck) {
-            HTMLParser hparser = new HTMLParser(page);
+            HTMLParser hparser = new HTMLParser(page, headers);
         }
     }
 

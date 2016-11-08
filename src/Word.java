@@ -15,16 +15,16 @@ public class Word {
     
     public Word(String word,WordHeaders header){
     	this.word = word;
-    	this.header = header;
+    	//this.header = header;
     }
 
-	public WordHeaders getHeader() {
+	/*public WordHeaders getHeader() {
 		return header;
 	}
 
 	public void setHeader(WordHeaders header) {
 		this.header = header;
-	}
+	}*/
 
 	public String getWord() {
 		return word;

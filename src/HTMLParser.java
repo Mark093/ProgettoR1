@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 public class HTMLParser {
 
-
+    private static HeaderList headers;
     /*public HTMLParser( String word ) {
         try {
             Document doc = Jsoup.connect("https://en.wiktionary.org/wiki/" + word).get();
@@ -25,7 +25,8 @@ public class HTMLParser {
         catch (IOException e) {}
     }*/
 
-    public HTMLParser( Document doc ) {
+    public HTMLParser( Document doc, HeaderList headers ) {
+        this.headers=headers;
         ParseText(doc);
     }
 
@@ -92,7 +93,7 @@ public class HTMLParser {
         if (pos.isEmpty()) pos = "Part of Speech not found";
         if (allowedPos(pos))
             System.out.println("\t" + lang + "\t" + pos);
-        return new PrepTable(table, title, lang, pos);
+        return new PrepTable(table, title, lang, pos, headers);
     }
 
     //Parser for the single list

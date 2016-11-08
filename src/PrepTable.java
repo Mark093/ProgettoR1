@@ -13,20 +13,23 @@ public class PrepTable {
     private String title;
     private String language;
     private String pos;
-    private Element table;
+    private static Element table;
     private List<Word> word;
+	private static HeaderList headers;
 
-    public PrepTable(Element table, String title, String language, String pos) {
+    public PrepTable(Element table, String title, String language, String pos, HeaderList headers) {
     	this.table = table;
         this.title=title;
         this.language=language;
         this.pos=pos;
+		this.headers=headers;
+		//You can call the function below (preprocessTable) from here.
     }
     
-    public void preprocessTable(TitlesHandler th){
-    	HeaderList headers = th.getHeaders();
+    static void preprocessTable(TitlesHandler th){
+    	//HeaderList headers = th.getHeaders();
     	List<WordHeaders> tableHeaders = new ArrayList<>();
-    	Iterator<Element> tableIterator = this.table.getElementsByTag("tr").iterator();
+    	Iterator<Element> tableIterator = table.getElementsByTag("tr").iterator();
     	//iterate through all the rows, i.e. tr
     	//you need to specify the position of each element in the table wrt row and column, so keep to integers r and c
     	int r = 0;
