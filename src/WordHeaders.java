@@ -9,4 +9,34 @@ public class WordHeaders {
     private String header;
     private int rowdistance;
     private int coldistance;
+    
+    public WordHeaders(int rowdistance, int coldistance, String header){
+    	this.rowdistance = rowdistance;
+    	this.coldistance = coldistance;
+    	this.header = header;
+    }
+
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
+	public int getRowdistance() {
+		return rowdistance;
+	}
+
+	public void setRowdistance(int rowdistance) {
+		this.rowdistance = rowdistance;
+	}
+
+	public int getColdistance() {
+		return coldistance;
+	}
+
+	public void setColdistance(int coldistance) {
+		this.coldistance = coldistance;
+	}
 }

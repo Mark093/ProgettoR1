@@ -43,62 +43,79 @@ public class HTMLParser {
 
     //Parser for the HTML page
     static void ParseText(Document doc) {
-        //TODO: get the title word from the doc element
-        String word = "TODO";
+    	//Get the title word from the doc element, it is in the head and in the form " word - Wiktionary", we only need the word
+    	String headTitle = doc.title();
+    	String word = headTitle.substring(0, headTitle.indexOf(' '));
         boolean tableflag=false;
         boolean listflag=false;
         System.out.println("Title: "+word);
         Elements tables= doc.getElementsByTag("table");
         Iterator<Element> tableiterator = tables.iterator();
         while (tableiterator.hasNext()) {
-            tableflag=true;
             Element table = tableiterator.next();
-            //TODO: implement the class used below and the clesses related to it, then choose how to use them
-            PrepTable p_table = ParseTable(table, word);
+            //TODO: implement the class used below and the classes related to it, then choose how to use them
+            //The table has always class attribute which contains the word "inflection-table"
+            //an example is at https://en.wiktionary.org/wiki/parlare ).
+			if (table.className().equalsIgnoreCase("inflection-table")||table.className().contains("inflection-table")){
+            		PrepTable p_table = ParseTable(table, word);
+                    tableflag=true;
+			}
         }
-        if (!tableflag) System.out.println("\tNo tables for this word");
-        //Parse the Parenthetical lists
-        Elements lists = doc.getElementsByTag("p");
+        if (!tableflag) 
+        	System.out.println("\tNo tables for this word");
+        //Parse the Parenthetical lists. Typically, you would have a h3 section with the POS (Noun, Verb..) and 
+        //the next element is the p which contains the parenthetical list of inflection
+        //an example is at https://en.wiktionary.org/wiki/parlare
+        Elements lists = doc.getAllElements();
         Iterator<Element> listiterator = lists.iterator();
         while (listiterator.hasNext()) {
-            listflag=true;
             Element list = listiterator.next();
-            ParseList(list);
+            list.tag();
+        	//if the actual element is an h3 and has as id a known POS, then the next element is the p containing the inflection list
+        	//best example is https://en.wiktionary.org/wiki/able
+            if(Tag.isKnownTag("h3") && (list.id().contains("Noun")||list.id().contains("Verb")||list.id().contains("Adjective"))){
+        		Element l = listiterator.next();
+        		ParseList(l);
+        		listflag=true;
+            }
         }
-        if (!listflag) System.out.println("\tNo lists for this word");
+        if (!listflag) 
+        	System.out.println("\tNo lists for this word");
     }
 
     //Parser for the single table
     static PrepTable ParseTable(Element table, String title) {
-        boolean noskip=true;
-
-        //TODO: find a way to detect if a table is interesting or not for us
-        if (table.className().equalsIgnoreCase("audiotable")||table.className().equalsIgnoreCase("toc")) {
-            noskip=false;
-            //System.out.println("\tTable skipped");
-        }
-        if (noskip) {
-            String lang = getLanguage(table);
-            String pos = getPOS(table, lang);
-            if (lang.isEmpty()) lang = "Language not found";
-            if (pos.isEmpty()) pos = "Part of Speech not found";
-            if (allowedPos(pos))
-                System.out.println("\t" + lang + "\t" + pos);
-                return new PrepTable(table, title, lang, pos);
-        }
-        return null;
+    	String lang = getLanguage(table);
+    	String pos = getPOS(table, lang);
+        if (lang.isEmpty()) lang = "Language not found";
+        if (pos.isEmpty()) pos = "Part of Speech not found";
+        if (allowedPos(pos))
+            System.out.println("\t" + lang + "\t" + pos);
+        return new PrepTable(table, title, lang, pos);
     }
 
     //Parser for the single list
     static void ParseList(Element list) {
-        boolean noskip=true;
-        String lang = getLanguage(list);
+    	String lang = getLanguage(list);
         String pos = getPOS(list, lang);
         if (lang.isEmpty()) lang = "Language not found";
         if (pos.isEmpty()) pos = "Part of Speech not found";
         if (allowedPos(pos))
             System.out.println("\t" + lang + "\t" + pos);
-
+        //in the list, the i contains the header (e.g., comparative, 3rd person,..) and the successive span contains the corresponding inflection
+        Iterator<Element> listiterator = list.children().iterator();
+        while (listiterator.hasNext()) {
+        	//in the list, you have one only header associated to each inflection
+        	Element el = listiterator.next();
+        	el.tag();
+			if(Tag.isKnownTag("i")){
+				//TODO: is it ownText???
+        		WordHeaders wh = new WordHeaders(1,1,el.ownText());
+        		String inflection = listiterator.next().ownText();
+        		Word inflectionWord = new Word(inflection, wh);
+            	//TODO: output
+        	}
+        }
     }
 
     //Get the language of a node (usually of a table)
