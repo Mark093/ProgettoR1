@@ -42,7 +42,7 @@ public class PrepTable {
         		//else the element is an inflection word, create the Word and associate its headers to it wrt the position
         		else{
         			String inflection = el.ownText();
-        			
+        			////////////
         		}
     			//TODO output
         		c++;
