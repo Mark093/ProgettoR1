@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by marco on 21/10/16.
+ * Created by marco on 21/10/16..
  * The XML parser: gets all the titles in the Wiktionary XML and call the HTML parsing method if necessary
  * (from the characters method).
  */

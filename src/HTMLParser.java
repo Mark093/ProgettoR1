@@ -1,6 +1,6 @@
 /**
  * Created by marco on 21/10/16.
- * In this class we will read the webpage related to the given word and we will extract data from it
+ * In this class we will read the webpage related to the given word and we will extract data from it.
  */
 
 import org.jsoup.Jsoup;

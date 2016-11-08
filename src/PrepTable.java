@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by marco on 26/10/16.
  * In this class we want to take the table and preprocess it to get the cell values and the headers and all the other info.
- * The stored values will be the list of words contained in the table with all the related headers
+ * The stored values will be the list of words contained in the table with all the related headers.
  */
 public class PrepTable {
     private String title;
