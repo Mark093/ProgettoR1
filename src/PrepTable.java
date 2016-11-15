@@ -46,6 +46,7 @@ public class PrepTable {
         		Element el = rowIterator.next();
         		//if the element is a header, create the WordHeader and set its position in order to give priority
         		if(headers.getHeaders().keySet().contains(el.text().trim().toUpperCase())){
+					//TODO: check the dimension of the cell: if it's more than 1x1, then replicate it.
         			WordHeaders wh = new WordHeaders(r,c,el.text().trim().toUpperCase());
         			tableHeaders.add(wh);
         		}
