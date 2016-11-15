@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,24 +8,30 @@ import java.util.List;
 public class Word {
     private String word;
     private List<WordHeaders> headers;
-    
+
     public Word(String word,List<WordHeaders> headers){
     	this.word = word;
     	this.headers = headers;
     }
-    
-    public Word(String word,WordHeaders header){
+
+    public Word(String word){
     	this.word = word;
-    	//this.header = header;
-    }
+		headers=new ArrayList<>();
+	}
+
+	public Word(String word, WordHeaders header){
+		this.word = word;
+		headers=new ArrayList<>();
+		headers.add(header);
+	}
 
 	/*public WordHeaders getHeader() {
 		return header;
 	}
-
-	public void setHeader(WordHeaders header) {
-		this.header = header;
-	}*/
+*/
+	public void addHeader(WordHeaders header) {
+		this.headers.add(header);
+	}
 
 	public String getWord() {
 		return word;
