@@ -118,7 +118,17 @@ public class PrepTable {
 						filteredrowheaders.add(wh);
 						wh=findHeaderList(0, wh.getColdistance()+1, wordheads);
 					}
-					//Step 3: get the corner headers by using the obtained two lists... TODO
+					//Step 3: get the corner headers by using the obtained two lists... and add all in the word list
+					word1.setHeaders(filteredrowheaders);
+					for (WordHeaders colhead : filteredcolheaders) {
+						word1.addHeader(colhead);
+						for (WordHeaders rowhead : filteredrowheaders) {
+							wh = findHeaderList(colhead.getRowdistance(), rowhead.getColdistance(), wordheads);
+							if (wh != null) {
+								word1.addHeader(wh);
+							}
+						}
+					}
         			//Add the obtained word in our list
 					word.add(word1);
         		}
