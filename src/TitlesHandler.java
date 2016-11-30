@@ -65,7 +65,6 @@ public class TitlesHandler extends DefaultHandler {
              *  of the pages in the first list. In this way we are sure we got the headers on the basis of the previous
              *  titles and the next refresh_freq (at least)
              *
-             *  todo: what happens at the end of the XML file?
             * */
             if (!foundTitle.contains(":")) {
                 if (!startCheck) {

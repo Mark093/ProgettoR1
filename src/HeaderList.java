@@ -18,7 +18,7 @@ import java.util.Set;
 public class HeaderList {
     //'frequence' is the min number of times that a word has to appear in order to be considered header.
     private static final int frequence=3;
-    private static final int refresh_freq=100;
+    private static final int refresh_freq=200;
     private Map<String, Integer> headers = new HashMap<>();
     private int pages_seen;
 

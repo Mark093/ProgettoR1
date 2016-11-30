@@ -74,59 +74,78 @@ public class PrepTable {
 						WordHeaders head1=new WordHeaders(rowdist,coldist,head.getHeader());
 						wordheads.add(head1);
 					}
-					//Step 2: select only the headers of interest
-					WordHeaders minwh, wh;
-					//Step 2.1: check on the columns
-					List<WordHeaders> filteredcolheaders = new ArrayList<>();
-					//Step 2.1.1: find the nearest header (on the column)
-					Iterator<WordHeaders> coliterator = wordheads.iterator();
-					minwh=coliterator.next();
-					while (coliterator.hasNext()&&minwh.getColdistance()!=0) {
-						minwh=coliterator.next();
-					}
-					while (coliterator.hasNext()) {
-						wh = coliterator.next();
-						if (wh.getColdistance()==0 && wh.getRowdistance()<minwh.getRowdistance())
-							minwh = wh;
-					}
-					filteredcolheaders.add(minwh);
-					//Step 2.1.2: find the consecutive ones and check that we need them
-					wh = findHeaderList(minwh.getRowdistance()+1, 0, wordheads);
-					/*					In practice below it checks that the cell on the left is an header too, otherwise it stops.*/
-					while(wh!=null && (findHeaderList(wh.getRowdistance(), 1, wordheads)!=null/*||findHeaderList(wh.getRowdistance(),-1,wordheads)!=null*/)) {
-						filteredcolheaders.add(wh);
-						wh = findHeaderList(wh.getRowdistance()+1, 0, wordheads);
-					}
-					//Step 2.2: check on the rows... As for the columns
-					List<WordHeaders> filteredrowheaders = new ArrayList<>();
-					//Step 2.2.1: find the nearest header (on the row)
-					Iterator<WordHeaders> rowiterator = wordheads.iterator();
-					minwh=rowiterator.next();
-					while (rowiterator.hasNext() && minwh.getRowdistance()!=0) {
-						minwh=rowiterator.next();
-					}
-					while (rowiterator.hasNext()) {
-						wh=rowiterator.next();
-						if (wh.getRowdistance()==0&&wh.getColdistance()<minwh.getColdistance()) {
-							minwh=wh;
-						}
-					}
-					filteredrowheaders.add(minwh);
-					//Step 2.2.2: find the consecutive ones and add in the list
-					wh=findHeaderList(0, minwh.getColdistance()+1, wordheads);
-					while (wh!=null) {
-						filteredrowheaders.add(wh);
-						wh=findHeaderList(0, wh.getColdistance()+1, wordheads);
-					}
-					//Step 3: get the corner headers by using the obtained two lists... and add all in the word list
-					word1.setHeaders(filteredrowheaders);
-					for (WordHeaders colhead : filteredcolheaders) {
-						word1.addHeader(colhead);
-						for (WordHeaders rowhead : filteredrowheaders) {
-							wh = findHeaderList(colhead.getRowdistance(), rowhead.getColdistance(), wordheads);
-							if (wh != null) {
-								word1.addHeader(wh);
+					System.out.print("Number of headers for the word: ");
+					System.out.print(word1.getWord());
+					System.out.print(": ");
+					System.out.println(wordheads.size());
+					if (wordheads.size()>0) {
+						//Step 2: select only the headers of interest
+						WordHeaders minwh, wh;
+						//Step 2.1: check on the columns
+						List<WordHeaders> filteredcolheaders = new ArrayList<>();
+						//Step 2.1.1: find the nearest header (on the column)
+						Iterator<WordHeaders> coliterator = wordheads.iterator();
+						if (coliterator.hasNext()) {
+							minwh = coliterator.next();
+							while (coliterator.hasNext() && minwh.getColdistance() != 0) {
+								minwh = coliterator.next();
 							}
+							while (coliterator.hasNext()) {
+								wh = coliterator.next();
+								if (wh.getColdistance() == 0 && wh.getRowdistance() < minwh.getRowdistance())
+									minwh = wh;
+							}
+							filteredcolheaders.add(minwh);
+							//Step 2.1.2: find the consecutive ones and check that we need them
+							wh = findHeaderList(minwh.getRowdistance() + 1, 0, wordheads);
+					/*					In practice below it checks that the cell on the left is an header too, otherwise it stops.*/
+							while (wh != null && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null/*||findHeaderList(wh.getRowdistance(),-1,wordheads)!=null*/)) {
+								filteredcolheaders.add(wh);
+								wh = findHeaderList(wh.getRowdistance() + 1, 0, wordheads);
+							}
+						}
+						//Step 2.2: check on the rows... As for the columns
+						List<WordHeaders> filteredrowheaders = new ArrayList<>();
+						//Step 2.2.1: find the nearest header (on the row)
+						Iterator<WordHeaders> rowiterator = wordheads.iterator();
+						if (rowIterator.hasNext()) {
+							minwh = rowiterator.next();
+							while (rowiterator.hasNext() && minwh.getRowdistance() != 0) {
+								minwh = rowiterator.next();
+							}
+							while (rowiterator.hasNext()) {
+								wh = rowiterator.next();
+								if (wh.getRowdistance() == 0 && wh.getColdistance() < minwh.getColdistance()) {
+									minwh = wh;
+								}
+							}
+							filteredrowheaders.add(minwh);
+							//Step 2.2.2: find the consecutive ones and add in the list
+							wh = findHeaderList(0, minwh.getColdistance() + 1, wordheads);
+							while (wh != null) {
+								filteredrowheaders.add(wh);
+								wh = findHeaderList(0, wh.getColdistance() + 1, wordheads);
+							}
+						}
+						//Step 3: get the corner headers by using the obtained two lists... and add all in the word list
+						List<WordHeaders> filteredcornheaders = new ArrayList<>();
+						if (filteredrowheaders.size()>0 && filteredcolheaders.size()>0) {
+							for (WordHeaders colhead : filteredcolheaders) {
+								for (WordHeaders rowhead : filteredrowheaders) {
+									wh = findHeaderList(colhead.getRowdistance(), rowhead.getColdistance(), wordheads);
+									if (wh != null) {
+										filteredcornheaders.add(wh);
+									}
+								}
+							}
+						}
+						//Step 4: add the lists to the word
+						word1.setHeaders(filteredrowheaders);
+						for (WordHeaders wh1 : filteredcolheaders) {
+							word1.addHeader(wh1);
+						}
+						for (WordHeaders wh1 : filteredcornheaders) {
+							word1.addHeader(wh1);
 						}
 					}
         			//Add the obtained word in our list

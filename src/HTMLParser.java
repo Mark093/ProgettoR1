@@ -68,7 +68,7 @@ public class HTMLParser {
         //Parse the Parenthetical lists. Typically, you would have a h3 section with the POS (Noun, Verb..) and 
         //the next element is the p which contains the parenthetical list of inflection
         //an example is at https://en.wiktionary.org/wiki/parlare
-        Elements lists = doc.getAllElements();
+        /*Elements lists = doc.getAllElements();
         Iterator<Element> listiterator = lists.iterator();
         while (listiterator.hasNext()) {
             Element list = listiterator.next();
@@ -82,7 +82,7 @@ public class HTMLParser {
             }
         }
         if (!listflag) 
-        	System.out.println("\tNo lists for this word");
+        	System.out.println("\tNo lists for this word");*/
     }
 
     //Parser for the single table
