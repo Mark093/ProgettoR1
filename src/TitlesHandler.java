@@ -22,7 +22,6 @@ public class TitlesHandler extends DefaultHandler {
     private int counter;
     private HeaderList headers = new HeaderList();
     private int refresh_freq;
-    //private String startWord=null;
 
 
     public TitlesHandler() {
@@ -45,12 +44,6 @@ public class TitlesHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         //maybe useless for us
     }
-    
-    
-    //to access the headers in PrepTable
-    public HeaderList getHeaders(){
-    	return headers;
-    }
 
     @Override
     public void characters(char ch[], int start, int length) throws SAXException {
@@ -70,28 +63,30 @@ public class TitlesHandler extends DefaultHandler {
                 if (!startCheck) {
                     docChecked.add(loadPage(foundTitle));
                     counter++;
-                    System.out.print(" "+counter);
+                    System.out.print("Loading Pages: "+counter+"/"+refresh_freq+"\r");
                     if (counter>=refresh_freq) {
+                        System.out.println("First loading done");
                         startCheck=true;
                         //start the training of the header set
                         for (Document page : docChecked) {
                             headers.addTables(page);
                         }
                         counter=0;
-                        System.out.println();
+                        //System.out.println();
                     }
                 }
                 else {
                     docToCheck.add(loadPage(foundTitle));
                     counter++;
-                    System.out.print(" "+counter);
+                    System.out.print("Loading Pages: "+counter+"/"+refresh_freq+"\r");
                     if (counter>=refresh_freq) {
+                        System.out.println("Loading done");
                         //train the header set with the new set
                         for (Document page : docToCheck) {
                             headers.addTables(page);
                         }
                         counter=0;
-                        System.out.println();
+                        //System.out.println();
                         headers.printHeaders();
                         //parse the pages with the old set
                         for (Document page : docChecked) {
@@ -102,9 +97,6 @@ public class TitlesHandler extends DefaultHandler {
                     }
                 }
             }
-            /*else {
-                System.out.println("\tWord not considered");
-            }*/
 
             title = false;
         }
