@@ -130,7 +130,7 @@ public class HTMLParser {
         			Element n = listiterator.next();
         			String inflection = n.text();
         			inflectionWord = new Word(inflection, wh);
-        			System.out.println(inflection + " " + el.text());
+        			//System.out.println(inflection + " " + el.text());
         		}
         	}
 			//special case is the span with class "gender" defining the gender attribute, either m or f or both

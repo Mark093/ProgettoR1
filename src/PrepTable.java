@@ -81,10 +81,10 @@ public class PrepTable {
 						WordHeaders head1=new WordHeaders(rowdist,coldist,head.getHeader());
 						wordheads.add(head1);
 					}
-					System.out.print("Number of headers for the word: ");
-					System.out.print(word1.getWord());
-					System.out.print(": ");
-					System.out.println(wordheads.size());
+					//System.out.print("Number of headers for the word: ");
+					//System.out.print(word1.getWord());
+					//System.out.print(": ");
+					//System.out.println(wordheads.size());
 					if (wordheads.size()>0) {
 						//Step 2: select only the headers of interest
 						WordHeaders minwh, wh;
