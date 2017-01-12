@@ -29,7 +29,8 @@ public class HTMLParser {
 
     public HTMLParser( Document doc, HeaderList headers ) {
         this.headers=headers;
-        ParseText(doc);
+        if (doc!=null)
+            ParseText(doc);
     }
 
     static boolean allowedPos(String pos) {

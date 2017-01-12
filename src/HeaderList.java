@@ -70,19 +70,21 @@ public class HeaderList {
     private static Map<String, Integer> getPageCells(Document doc) {
         Map<String, Integer> headers=new HashMap<>();
         //Get all the tables
-        Elements tables= doc.getElementsByTag("table");
-        //Extract the words from the cells and check them
-        for (Element table : tables) {
-            if (!(table.className().equalsIgnoreCase("audiotable")||table.className().equalsIgnoreCase("toc"))) {
-                Elements rows=table.getElementsByTag("tr");
-                for (Element row : rows) {
-                    Elements cells = row.children();
-                    for (Element cell : cells) {
-                        if (cell.hasText()) {
-                            String celltext = cell.text().trim().toUpperCase();
-                            if (!celltext.isEmpty()) {
-                                if (!headers.containsKey(celltext)) {
-                                    headers.put(celltext, new Integer(1));
+        if (doc != null) {
+            Elements tables = doc.getElementsByTag("table");
+            //Extract the words from the cells and check them
+            for (Element table : tables) {
+                if (!(table.className().equalsIgnoreCase("audiotable") || table.className().equalsIgnoreCase("toc"))) {
+                    Elements rows = table.getElementsByTag("tr");
+                    for (Element row : rows) {
+                        Elements cells = row.children();
+                        for (Element cell : cells) {
+                            if (cell.hasText()) {
+                                String celltext = cell.text().trim().toUpperCase();
+                                if (!celltext.isEmpty()) {
+                                    if (!headers.containsKey(celltext)) {
+                                        headers.put(celltext, new Integer(1));
+                                    }
                                 }
                             }
                         }
