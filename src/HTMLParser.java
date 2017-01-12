@@ -9,6 +9,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,32 +59,38 @@ public class HTMLParser {
             Element table = tableiterator.next();
             //TODO: implement the class used below and the classes related to it, then choose how to use them
             //The table has always class attribute which contains the word "inflection-table"
-            //an example is at https://en.wiktionary.org/wiki/parlare ).
+            //an example is at https://en.wiktionary.org/wiki/sprechen 
 			if (table.className().equalsIgnoreCase("inflection-table")||table.className().contains("inflection-table")){
             		PrepTable p_table = ParseTable(table, word);
                     tableflag=true;
+                    //Todo: OUTPUT
 			}
         }
         if (!tableflag) 
         	System.out.println("\tNo tables for this word");
-        //Parse the Parenthetical lists. Typically, you would have a h3 section with the POS (Noun, Verb..) and 
-        //the next element is the p which contains the parenthetical list of inflection
-        //an example is at https://en.wiktionary.org/wiki/parlare
-        /*Elements lists = doc.getAllElements();
+        //Parse the Parenthetical lists. Typically, you would have a h1-2-3-.. section with the POS (Noun, Verb..) and 
+        //the next element is the p which contains the parenthetical list of inflection. If p has no children nodes, then there is no declension;
+        //else, parse the declension
+        Elements lists = doc.getAllElements();
         Iterator<Element> listiterator = lists.iterator();
         while (listiterator.hasNext()) {
             Element list = listiterator.next();
-            list.tag();
-        	//if the actual element is an h3 and has as id a known POS, then the next element is the p containing the inflection list
+            String tag = list.tag().toString();
+        	//if the actual element is an h element and has as id a known POS, then the next element is the p containing the inflection list,
+            //if the p element has some children nodes
         	//best example is https://en.wiktionary.org/wiki/able
-            if(Tag.isKnownTag("h3") && (list.id().contains("Noun")||list.id().contains("Verb")||list.id().contains("Adjective"))){
-        		Element l = listiterator.next();
-        		ParseList(l);
-        		listflag=true;
+            if(tag.matches("h[1-9]+") && list.id().contains("Noun")||list.id().contains("Noun_2")||list.id().contains("Noun_3")||list.id().contains("Verb")||list.id().contains("Adjective")){
+        		//need to access next p element, which is next sibling
+            	Element l = list.parent().nextElementSibling();
+        		if(l.childNodes().size()>1){
+        			PrepTable p_table = ParseList(l, word);
+        			listflag=true;
+                    //Todo: Output
+        		}
             }
         }
         if (!listflag) 
-        	System.out.println("\tNo lists for this word");*/
+        	System.out.println("\tNo lists for this word");
     }
 
     //Parser for the single table
@@ -97,27 +105,43 @@ public class HTMLParser {
     }
 
     //Parser for the single list
-    static void ParseList(Element list) {
+    static PrepTable ParseList(Element list, String title) {
     	String lang = getLanguage(list);
         String pos = getPOS(list, lang);
         if (lang.isEmpty()) lang = "Language not found";
         if (pos.isEmpty()) pos = "Part of Speech not found";
+        PrepTable p_table = new PrepTable(title, lang, pos);
         if (allowedPos(pos))
             System.out.println("\t" + lang + "\t" + pos);
-        //in the list, the i contains the header (e.g., comparative, 3rd person,..) and the successive span contains the corresponding inflection
+        //in the list, the i contains the header (e.g., comparative, 3rd person,..) and the successive element (span, b,..) contains the corresponding inflection
         Iterator<Element> listiterator = list.children().iterator();
+        //the first child element is a strong element, which contains the word itself;
+        //you use ownText() because it provides the text of this only element, not its children
+        String word = listiterator.next().ownText();
         while (listiterator.hasNext()) {
         	//in the list, you have one only header associated to each inflection
         	Element el = listiterator.next();
-        	el.tag();
-			if(Tag.isKnownTag("i")){
-				//TODO: is it ownText???
-        		WordHeaders wh = new WordHeaders(1,1,el.ownText());
-        		String inflection = listiterator.next().ownText();
-        		Word inflectionWord = new Word(inflection, wh);
-            	//TODO: output
+            Word inflectionWord = null;
+			if(el.tag().isKnownTag("i")){
+	        	//process header, which MUST be contained in the known headers; set row and column distance to default 1,1
+        		WordHeaders wh = new WordHeaders(1,1,el.text());
+        		//process inflection, if it exists
+        		if(listiterator.hasNext()){
+        			Element n = listiterator.next();
+        			String inflection = n.text();
+        			inflectionWord = new Word(inflection, wh);
+        			System.out.println(inflection + " " + el.text());
+        		}
         	}
+			//special case is the span with class "gender" defining the gender attribute, either m or f or both
+			else if(el.hasClass("gender")){
+				WordHeaders wh = new WordHeaders(1,1,el.text());
+				inflectionWord = new Word(word,wh);
+			}
+			if (inflectionWord!=null)
+			    p_table.addWord(inflectionWord);
         }
+        return p_table;
     }
 
     //Get the language of a node (usually of a table)
@@ -144,10 +168,10 @@ public class HTMLParser {
     }
 
     //Get the POS of table content
-    static String getPOS(Element table, String lang) {
+    static String getPOS(Element el, String lang) {
         boolean found=false;
         String pos=new String("");
-        Element divFrame=table;
+        Element divFrame=el;
         //Get the node at the same level of the XML tag with the language
         while(!divFrame.parent().id().equalsIgnoreCase("mw-content-text")) {
             divFrame=divFrame.parent();
@@ -171,5 +195,5 @@ public class HTMLParser {
         }
         return pos;
     }
-
+    
 }

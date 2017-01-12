@@ -19,14 +19,21 @@ public class PrepTable {
 
     public PrepTable(Element table, String title, String language, String pos, HeaderList headers) {
     	this.table = table;
-        this.title=title;
-        this.language=language;
-        this.pos=pos;
-		this.headers=headers;
-		this.word=new ArrayList<>();
+        this.title = title;
+        this.language = language;
+        this.pos = pos;
+		this.headers = headers;
+		this.word = new ArrayList<>();
 		//You can call the function below (preprocessTable) from here.
 		preprocessTable();
     }
+
+    public PrepTable (String title, String language, String pos) {
+		this.title = title;
+		this.language = language;
+		this.pos = pos;
+		this.word = new ArrayList<>();
+	}
     
     static void preprocessTable(){
     	//HeaderList headers = th.getHeaders();
@@ -98,7 +105,7 @@ public class PrepTable {
 							filteredcolheaders.add(minwh);
 							//Step 2.1.2: find the consecutive ones and check that we need them
 							wh = findHeaderList(minwh.getRowdistance() + 1, 0, wordheads);
-					/*					In practice below it checks that the cell on the left is an header too, otherwise it stops.*/
+					/*	In practice below it checks that the cell on the left is an header too, otherwise it stops.*/
 							while (wh != null && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null/*||findHeaderList(wh.getRowdistance(),-1,wordheads)!=null*/)) {
 								filteredcolheaders.add(wh);
 								wh = findHeaderList(wh.getRowdistance() + 1, 0, wordheads);
@@ -167,9 +174,9 @@ public class PrepTable {
 		return word;
 	}
 
-	/*public void setWord(List<Word> word) {
-		this.word = word;
-	}*/
+	public void addWord(Word s_word) {
+		word.add(s_word);
+	}
     
     
 }
