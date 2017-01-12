@@ -29,24 +29,35 @@ public class Word {
 		return header;
 	}
 */
-	public void addHeader(WordHeaders header) {
+	/*public void addHeader(WordHeaders header) {
 		this.headers.add(header);
+	}*/
+
+	public void addHeaders(List<WordHeaders> headerlist) {
+		this.headers.addAll(headerlist);
 	}
 
 	public String getWord() {
 		return word;
 	}
 
-	public void setWord(String word) {
+	/*public void setWord(String word) {
 		this.word = word;
-	}
+	}*/
 
 	public List<WordHeaders> getHeaders() {
 		return headers;
 	}
 
-	public void setHeaders(List<WordHeaders> headers) {
-		this.headers = headers;
+	public void setHeaders(List<WordHeaders> headerlist) {
+		this.headers = new ArrayList<>();
+		this.headers.addAll(headerlist);
+	}
+
+	public void PrintHeaders() {
+		for (WordHeaders wh : this.headers) {
+			System.out.println(" * "+wh.getHeader());
+		}
 	}
     
 }

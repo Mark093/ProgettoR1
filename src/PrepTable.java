@@ -46,6 +46,9 @@ public class PrepTable {
         while (tableIterator.hasNext()) {
 			r++;	//the row index
 			c=0;	//the column index
+			//Check if there is already something at the beginning of the row
+			while(findHeaderList(r,c+1,tableHeaders)!=null)
+				c++;
         	Element row = tableIterator.next();
         	Iterator<Element> rowIterator = row.children().iterator();
         	while(rowIterator.hasNext()){
@@ -64,6 +67,7 @@ public class PrepTable {
 							WordHeaders wh = new WordHeaders(r+i,c+j,el.text().trim().toUpperCase());
 							tableHeaders.add(wh);
 						}
+					c+=colsp-1;
         		}
         		//else the element is an inflection word, create the Word and associate its headers to it wrt the position
 				//NOTE: we can do this because the headers of a cell MUST BE among the ones we have already seen. We don't care of the next cells.
@@ -81,10 +85,6 @@ public class PrepTable {
 						WordHeaders head1=new WordHeaders(rowdist,coldist,head.getHeader());
 						wordheads.add(head1);
 					}
-					//System.out.print("Number of headers for the word: ");
-					//System.out.print(word1.getWord());
-					//System.out.print(": ");
-					//System.out.println(wordheads.size());
 					if (wordheads.size()>0) {
 						//Step 2: select only the headers of interest
 						WordHeaders minwh, wh;
@@ -105,8 +105,8 @@ public class PrepTable {
 							filteredcolheaders.add(minwh);
 							//Step 2.1.2: find the consecutive ones and check that we need them
 							wh = findHeaderList(minwh.getRowdistance() + 1, 0, wordheads);
-					/*	In practice below it checks that the cell on the left is an header too, otherwise it stops.*/
-							while (wh != null && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null/*||findHeaderList(wh.getRowdistance(),-1,wordheads)!=null*/)) {
+					/*	In practice below it checks that the cell on the left or the one on the right is an header too, otherwise it stops.*/
+							while (wh != null && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null||findHeaderList(wh.getRowdistance(),-1,wordheads)!=null)) {
 								filteredcolheaders.add(wh);
 								wh = findHeaderList(wh.getRowdistance() + 1, 0, wordheads);
 							}
@@ -148,12 +148,21 @@ public class PrepTable {
 						}
 						//Step 4: add the lists to the word
 						word1.setHeaders(filteredrowheaders);
-						for (WordHeaders wh1 : filteredcolheaders) {
-							word1.addHeader(wh1);
-						}
-						for (WordHeaders wh1 : filteredcornheaders) {
-							word1.addHeader(wh1);
-						}
+						word1.addHeaders(filteredcolheaders);
+						word1.addHeaders(filteredcornheaders);
+						System.out.print("Number of headers for the word: ");
+						System.out.print(word1.getWord());
+						System.out.print(": ");
+						System.out.print(word1.getHeaders().size());
+						System.out.print(" of ");
+						System.out.print(wordheads.size());
+						System.out.print("  _  row: ");
+						System.out.print(filteredrowheaders.size());
+						System.out.print("  _  column: ");
+						System.out.print(filteredcolheaders.size());
+						System.out.print("  _  corner: ");
+						System.out.println(filteredcornheaders.size());
+						word1.PrintHeaders();
 					}
         			//Add the obtained word in our list
 					word.add(word1);
