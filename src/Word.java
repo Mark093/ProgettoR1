@@ -1,39 +1,28 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by marco on 26/10/16.
- * In this class we have the single word and the list of the related headers in form row, column, corner..
+ * In this class we have the single word and the list of the related headers in form row, column, corner...
  */
 public class Word {
     private String word;
-    private List<WordHeaders> headers;
-
-    public Word(String word,List<WordHeaders> headers){
-    	this.word = word;
-    	this.headers = headers;
-    }
+    private Set<String> headers;
 
     public Word(String word){
     	this.word = word;
-		headers=new ArrayList<>();
+		headers=new TreeSet<>();
 	}
 
-	public Word(String word, WordHeaders header){
+	public Word(String word, String header){
 		this.word = word;
-		headers=new ArrayList<>();
+		headers=new TreeSet<>();
 		headers.add(header);
 	}
 
-	/*public WordHeaders getHeader() {
-		return header;
-	}
-*/
-	/*public void addHeader(WordHeaders header) {
-		this.headers.add(header);
-	}*/
-
-	public void addHeaders(List<WordHeaders> headerlist) {
+	public void addHeaders(Set<String> headerlist) {
 		this.headers.addAll(headerlist);
 	}
 
@@ -41,22 +30,14 @@ public class Word {
 		return word;
 	}
 
-	/*public void setWord(String word) {
-		this.word = word;
-	}*/
-
-	public List<WordHeaders> getHeaders() {
+	public Set<String> getHeaders() {
 		return headers;
 	}
 
-	public void setHeaders(List<WordHeaders> headerlist) {
-		this.headers = new ArrayList<>();
-		this.headers.addAll(headerlist);
-	}
-
 	public void PrintHeaders() {
-		for (WordHeaders wh : this.headers) {
-			System.out.println(" * "+wh.getHeader());
+		System.out.println("Word: "+word);
+		for (String wh : this.headers) {
+			System.out.println(" * "+wh);
 		}
 	}
     

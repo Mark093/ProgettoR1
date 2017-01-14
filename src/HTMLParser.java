@@ -15,20 +15,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class HTMLParser {
 
     private static HeaderList headers;
-    /*public HTMLParser( String word ) {
-        try {
-            Document doc = Jsoup.connect("https://en.wiktionary.org/wiki/" + word).get();
-            ParseText(doc, word);
-        }
-        catch (IOException e) {}
-    }*/
+    private static List<String> languages;
 
-    public HTMLParser( Document doc, HeaderList headers ) {
+    public HTMLParser( Document doc, HeaderList headers, List<String> langs ) {
         this.headers=headers;
+        languages = langs;
         if (doc!=null)
             ParseText(doc);
     }
@@ -51,25 +47,26 @@ public class HTMLParser {
     	//Get the title word from the doc element, it is in the head and in the form " word - Wiktionary", we only need the word
     	String headTitle = doc.title();
     	String word = headTitle.substring(0, headTitle.indexOf(' '));
-        boolean tableflag=false;
-        boolean listflag=false;
+        boolean tableflag = false;
+        boolean listflag = false;
         System.out.println("Title: "+word);
         Elements tables= doc.getElementsByTag("table");
         Iterator<Element> tableiterator = tables.iterator();
         while (tableiterator.hasNext()) {
             Element table = tableiterator.next();
-            //TODO: implement the class used below and the classes related to it, then choose how to use them
             //The table has always class attribute which contains the word "inflection-table"
             //an example is at https://en.wiktionary.org/wiki/sprechen 
 			if (table.className().equalsIgnoreCase("inflection-table")||table.className().contains("inflection-table")){
-            		PrepTable p_table = ParseTable(table, word);
-                    tableflag=true;
+                if (allowedLang(getLanguage(table))) {
+                    PrepTable p_table = ParseTable(table, word);
+                    tableflag = true;
                     //Todo: OUTPUT
+                }
 			}
         }
         if (!tableflag) 
         	System.out.println("\tNo tables for this word");
-        //Parse the Parenthetical lists. Typically, you would have a h1-2-3-.. section with the POS (Noun, Verb..) and 
+        //Parse the Parenthetical lists. Typically, you would have a h1-2-3-... section with the POS (Noun, Verb..) and
         //the next element is the p which contains the parenthetical list of inflection. If p has no children nodes, then there is no declension;
         //else, parse the declension
         Elements lists = doc.getAllElements();
@@ -83,10 +80,12 @@ public class HTMLParser {
             if(tag.matches("h[1-9]+") && list.id().contains("Noun")||list.id().contains("Noun_2")||list.id().contains("Noun_3")||list.id().contains("Verb")||list.id().contains("Adjective")){
         		//need to access next p element, which is next sibling
             	Element l = list.parent().nextElementSibling();
-        		if(l.childNodes().size()>1){
-        			PrepTable p_table = ParseList(l, word);
-        			listflag=true;
-                    //Todo: Output
+        		if(l.childNodes().size()>1) {
+                    if (allowedLang(getLanguage(l))) {
+                        PrepTable p_table = ParseList(l, word);
+                        listflag = true;
+                        //Todo: Output
+                    }
         		}
             }
         }
@@ -125,7 +124,7 @@ public class HTMLParser {
             Word inflectionWord = null;
 			if(el.tag().isKnownTag("i")){
 	        	//process header, which MUST be contained in the known headers; set row and column distance to default 1,1
-        		WordHeaders wh = new WordHeaders(1,1,el.text());
+        		String wh = new String(el.text());
         		//process inflection, if it exists
         		if(listiterator.hasNext()){
         			Element n = listiterator.next();
@@ -136,7 +135,7 @@ public class HTMLParser {
         	}
 			//special case is the span with class "gender" defining the gender attribute, either m or f or both
 			else if(el.hasClass("gender")){
-				WordHeaders wh = new WordHeaders(1,1,el.text());
+				String wh = new String(el.text());
 				inflectionWord = new Word(word,wh);
 			}
 			if (inflectionWord!=null)
@@ -146,7 +145,7 @@ public class HTMLParser {
     }
 
     //Get the language of a node (usually of a table)
-    static String getLanguage(Element element) {
+    public static String getLanguage(Element element) {
         boolean found=false;
         String lang = new String("");
         //Get the node at the same level of the XML tag with the language
@@ -169,7 +168,7 @@ public class HTMLParser {
     }
 
     //Get the POS of table content
-    static String getPOS(Element el, String lang) {
+    public static String getPOS(Element el, String lang) {
         boolean found=false;
         String pos=new String("");
         Element divFrame=el;
@@ -195,6 +194,17 @@ public class HTMLParser {
             divFrame = divFrame.previousElementSibling();
         }
         return pos;
+    }
+
+    private static boolean allowedLang(String lang) {
+        //languages null means that we want to parse all the languages
+        if (languages == null)
+            return true;
+        for (String all_lang : languages) {
+            if (all_lang.equalsIgnoreCase(lang))
+                return true;
+        }
+        return false;
     }
     
 }

@@ -6,10 +6,7 @@ import org.jsoup.select.Elements;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by marco on 27/10/16.
@@ -17,32 +14,29 @@ import java.util.Set;
  */
 public class HeaderList {
     //'frequence' is the min number of times that a word has to appear in order to be considered header.
-    private static final int frequence=3;
-    private static final int refresh_freq=400;
+    private static int frequence;
+    private static int refresh_freq;
+    private static List<String> languages;
     private Map<String, Integer> headers = new HashMap<>();
     private int pages_seen;
 
-    public HeaderList() {
+    public HeaderList(int ref_freq, int thr_freq, List<String> langs) {
         pages_seen=0;
+        refresh_freq = ref_freq;
+        frequence = thr_freq;
+        languages = langs;
     }
 
     public Map<String, Integer> getHeaders() {
         return new HashMap<>(headers);
     }
 
-    //Given the cell String, it returns the frequency of the word if it is greater than the threshold, otherwise returns 0
-    public int getHeader(String cell) {
-        if (headers.containsKey(cell)) {
-            int frvalue=headers.get(cell).intValue();
-            if (frvalue>=frequence) {
-                return frvalue;
-            }
-        }
-        return 0;
-    }
-
     public int getRefreshFreq() {
         return refresh_freq;
+    }
+
+    public static int getThrFrequence() {
+        return frequence;
     }
 
     //This function is used in order to learn continuously new headers
@@ -67,6 +61,7 @@ public class HeaderList {
         }
     }
 
+    //Parse the tables of the page and stores all the words contained in it with counter 1
     private static Map<String, Integer> getPageCells(Document doc) {
         Map<String, Integer> headers=new HashMap<>();
         //Get all the tables
@@ -75,15 +70,17 @@ public class HeaderList {
             //Extract the words from the cells and check them
             for (Element table : tables) {
                 if (!(table.className().equalsIgnoreCase("audiotable") || table.className().equalsIgnoreCase("toc"))) {
-                    Elements rows = table.getElementsByTag("tr");
-                    for (Element row : rows) {
-                        Elements cells = row.children();
-                        for (Element cell : cells) {
-                            if (cell.hasText()) {
-                                String celltext = cell.text().trim().toUpperCase();
-                                if (!celltext.isEmpty()) {
-                                    if (!headers.containsKey(celltext)) {
-                                        headers.put(celltext, new Integer(1));
+                    if (allowedLang(HTMLParser.getLanguage(table))) {
+                        Elements rows = table.getElementsByTag("tr");
+                        for (Element row : rows) {
+                            Elements cells = row.children();
+                            for (Element cell : cells) {
+                                if (cell.hasText()) {
+                                    String celltext = cell.text().replaceAll("\\s", " ").trim().toUpperCase();
+                                    if (!celltext.isEmpty() && !celltext.matches("-|—")) {
+                                        if (!headers.containsKey(celltext)) {
+                                            headers.put(celltext, new Integer(1));
+                                        }
                                     }
                                 }
                             }
@@ -95,17 +92,15 @@ public class HeaderList {
         return headers;
     }
 
-    // WHAT IF WE CHECK THE KIND OF CELL AND SET AN HIGHER VALUE IF THE CELL IS A TH (AS IN THE PREVIOUS VERSION)
-    private static Map<String, Integer> frequentCells(String page/*, Map<String,Integer> headers*/){
-        //parse cells push them into a Map (hint: remove whitespaces at the beginning and the end of the string by using trim())
-        Map<String, Integer> headers = new HashMap<>();
-        try {
-            //Open the Wiktionary page
-            Document doc = Jsoup.connect("https://en.wiktionary.org/wiki/" + page).get();
-            headers=getPageCells(doc);
+    private static boolean allowedLang(String lang) {
+        //languages null means that we want to parse all the languages
+        if (languages == null)
+            return true;
+        for (String all_lang : languages) {
+            if (all_lang.equalsIgnoreCase(lang))
+                return true;
         }
-        catch (IOException e) {}
-        return headers;
+        return false;
     }
 
     private static Map<String, Integer> removeNotFrequent(Map<String, Integer> headers) {

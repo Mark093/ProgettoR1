@@ -22,25 +22,12 @@ public class WordHeaders {
 		return header;
 	}
 
-	public void setHeader(String header) {
-		this.header = header;
-	}
-
 	public int getRowdistance() {
 		return rowdistance;
-	}
-
-	public void setRowdistance(int rowdistance) {
-		this.rowdistance = rowdistance;
 	}
 
 	public int getColdistance() {
 		return coldistance;
 	}
 
-	public void setColdistance(int coldistance) {
-		this.coldistance = coldistance;
-	}
-
-	//public Pair<Integer,Integer> getPair() { return new Pair<>(rowdistance,coldistance); }
 }

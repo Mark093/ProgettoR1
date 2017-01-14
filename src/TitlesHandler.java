@@ -20,17 +20,21 @@ public class TitlesHandler extends DefaultHandler {
     private List<Document> docChecked;
     private List<Document> docToCheck;
     private int counter;
-    private HeaderList headers = new HeaderList();
+    private HeaderList headers;
     private int refresh_freq;
+    private List<String> languages;
 
 
-    public TitlesHandler() {
+    public TitlesHandler(int ref_freq, int thr_freq, List<String> languages) {
         super();
+        headers = new HeaderList(ref_freq, thr_freq, languages);
+        this.languages = languages;
         startCheck=false;
         counter=0;
         refresh_freq=headers.getRefreshFreq();
         docChecked=new ArrayList<>(refresh_freq);
         docToCheck=new ArrayList<>(refresh_freq);
+        System.out.println("Starting parsing: refresh frequency: "+refresh_freq+", threshold frequency: "+headers.getThrFrequence());
     }
 
     @Override
@@ -42,7 +46,7 @@ public class TitlesHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        //maybe useless for us
+        //Useless for us
     }
 
     @Override
@@ -90,7 +94,7 @@ public class TitlesHandler extends DefaultHandler {
                         headers.printHeaders();
                         //parse the pages with the old set
                         for (Document page : docChecked) {
-                            HTMLParser hparser = new HTMLParser(page, headers);
+                            HTMLParser hparser = new HTMLParser(page, headers, languages);
                         }
                         docChecked=docToCheck;
                         docToCheck=new ArrayList<>(refresh_freq);
@@ -106,10 +110,10 @@ public class TitlesHandler extends DefaultHandler {
     @Override
     public void endDocument() throws SAXException {
         for (Document page : docChecked) {
-            HTMLParser hparser = new HTMLParser(page, headers);
+            HTMLParser hparser = new HTMLParser(page, headers, languages);
         }
         for (Document page : docToCheck) {
-            HTMLParser hparser = new HTMLParser(page, headers);
+            HTMLParser hparser = new HTMLParser(page, headers, languages);
         }
     }
 
