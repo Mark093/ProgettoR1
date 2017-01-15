@@ -49,6 +49,7 @@ public class HeaderList {
             headers=removeNotFrequent(headers);
             System.out.println("Not frequent headers removed");
         }
+        return;
     }
 
     //Prints all the headers
@@ -59,6 +60,7 @@ public class HeaderList {
             String key = iterator.next();
             System.out.println(key+", "+headers.get(key).toString());
         }
+        return;
     }
 
     //Parse the tables of the page and stores all the words contained in it with counter 1

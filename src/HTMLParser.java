@@ -61,9 +61,11 @@ public class HTMLParser {
 			if (table.className().equalsIgnoreCase("inflection-table")||table.className().contains("inflection-table")){
                 if (allowedLang(getLanguage(table))) {
                     PrepTable p_table = ParseTable(table, word);
-                    tableflag = true;
-                    //Output
-                    output.write(p_table);
+                    if (p_table!=null) {
+                        tableflag = true;
+                        //Output
+                        output.write(p_table);
+                    }
                 }
 			}
         }
@@ -86,25 +88,30 @@ public class HTMLParser {
         		if(l.childNodes().size()>1) {
                     if (allowedLang(getLanguage(l))) {
                         PrepTable p_table = ParseList(l, word);
-                        listflag = true;
-                        //Output
-                        output.write(p_table);
+                        if (p_table!=null) {
+                            listflag = true;
+                            //Output
+                            output.write(p_table);
+                        }
                     }
         		}
             }
         }
         if (!listflag) 
         	System.out.println("\tNo lists for this word");
+        return;
     }
 
     //Parser for the single table
     static PrepTable ParseTable(Element table, String title) {
     	String lang = getLanguage(table);
     	String pos = getPOS(table, lang);
-        if (lang.isEmpty()) lang = "Language not found";
-        if (pos.isEmpty()) pos = "Part of Speech not found";
+        if (lang.isEmpty()) return null;
+        if (pos.isEmpty()) return null;
         if (allowedPos(pos))
             System.out.println("\t" + lang + "\t" + pos);
+        else
+            return null;
         return new PrepTable(table, title, lang, pos, headers);
     }
 
@@ -112,11 +119,13 @@ public class HTMLParser {
     static PrepTable ParseList(Element list, String title) {
     	String lang = getLanguage(list);
         String pos = getPOS(list, lang);
-        if (lang.isEmpty()) lang = "Language not found";
-        if (pos.isEmpty()) pos = "Part of Speech not found";
+        if (lang.isEmpty()) return null;
+        if (pos.isEmpty()) return null;
         PrepTable p_table = new PrepTable(title, lang, pos);
         if (allowedPos(pos))
             System.out.println("\t" + lang + "\t" + pos);
+        else
+            return null;
         //in the list, the i contains the header (e.g., comparative, 3rd person,..) and the successive element (span, b,..) contains the corresponding inflection
         Iterator<Element> listiterator = list.children().iterator();
         //the first child element is a strong element, which contains the word itself;
@@ -126,22 +135,24 @@ public class HTMLParser {
         	//in the list, you have one only header associated to each inflection
         	Element el = listiterator.next();
             Word inflectionWord = null;
-			if(el.tag().isKnownTag("i")){
-	        	//process header, which MUST be contained in the known headers; set row and column distance to default 1,1
-        		String wh = new String(el.text());
-        		//process inflection, if it exists
-        		if(listiterator.hasNext()){
-        			Element n = listiterator.next();
-        			String inflection = n.text();
-        			inflectionWord = new Word(inflection, wh);
-        			//System.out.println(inflection + " " + el.text());
-        		}
-        	}
-			//special case is the span with class "gender" defining the gender attribute, either m or f or both
-			else if(el.hasClass("gender")){
-				String wh = new String(el.text());
-				inflectionWord = new Word(word,wh);
-			}
+            //special case is the span with class "gender" defining the gender attribute, either m or f or both
+            if(el.hasClass("gender")){
+                String wh = el.text().replaceAll("\\s", " ").trim().toUpperCase();
+                inflectionWord = new Word(word,wh);
+            }
+            else {
+                if (el.tag().isKnownTag("i")) {
+                    //process header, which MUST be contained in the known headers;
+                    String wh = el.text().replaceAll("\\s", " ").trim().toUpperCase();
+                    //process inflection, if it exists
+                    if (listiterator.hasNext()) {
+                        Element n = listiterator.next();
+                        String inflection = n.text();
+                        inflectionWord = new Word(inflection, wh);
+                        System.out.println(inflection + " " + wh);
+                    }
+                }
+            }
 			if (inflectionWord!=null)
 			    p_table.addWord(inflectionWord);
         }

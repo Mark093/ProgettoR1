@@ -62,7 +62,7 @@ public class PrepTable {
 				}
         		Element el = rowIterator.next();
         		//if the element is a header, create the WordHeader and set its position in order to give priority
-        		if(headers.getHeaders().keySet().contains(el.text().trim().toUpperCase())){
+        		if(headers.getHeaders().keySet().contains(el.text().replaceAll("\\s", " ").trim().toUpperCase())){
 					//DONE: check the dimension of the cell: if it's more than 1x1, then replicate it.
 					int rowsp=1, colsp=1;
 					if (el.hasAttr("rowspan"))
@@ -80,7 +80,7 @@ public class PrepTable {
         		//else the element could be an inflection word, create the Word and associate its headers to it wrt the position
 				//NOTE: we can do this because the headers of a cell MUST BE among the ones we have already seen. We don't care of the next cells.
         		else {
-					String inflection = el.text().replaceAll("\\s", " ").trim();
+					String inflection = el.text().replaceAll("\\s", " ").replaceAll("[0-9]","").trim();
 					int colsp = 1;
 					int rowsp = 1;
 					if (el.hasAttr("colspan")) {
@@ -183,6 +183,7 @@ public class PrepTable {
     			//Output done: in the word list.
         	}
         }
+        return;
     }
 
     private static WordHeaders findHeaderList(int rowdist, int coldist, List<WordHeaders> whlist) {
@@ -203,6 +204,7 @@ public class PrepTable {
 	private static void setUsed(int row, int col) {
 		Pair<Integer,Integer> pair = new Pair<>(row,col);
 		usedcells.add(pair);
+		return;
 	}
 
 	public static Set<String> collapseHeaders(List<WordHeaders> hlist) {
@@ -231,6 +233,7 @@ public class PrepTable {
 	//Setters
 	public void addWord(Word s_word) {
 		word.add(s_word);
+		return;
 	}
 
 	//Getters

@@ -22,6 +22,7 @@ public class Word {
 
 	public void addHeaders(Set<String> headerlist) {
 		this.headers.addAll(headerlist);
+		return;
 	}
 
 	public String getWord() {
@@ -37,6 +38,7 @@ public class Word {
 		for (String wh : this.headers) {
 			System.out.println(" * "+wh);
 		}
+		return;
 	}
     
 }

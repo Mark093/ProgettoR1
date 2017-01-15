@@ -21,7 +21,7 @@ public class Main {
     public static void main(String argv[]) {
 
         //Open the XML file and parse its "titles" for listing the pages that we have to check on Wiktionary
-        String nFile=new String("enwiktionary-20160305-pages-articles.xml");
+        String nFile = "enwiktionary-20160305-pages-articles.xml";
         SAXParserFactory factory = SAXParserFactory.newInstance();
         String fname=null;
         int refresh_freq = 400;
@@ -43,10 +43,21 @@ public class Main {
                 threshold_freq = Integer.parseInt(argv[2]);
                 System.out.println("Using custom parameters");
                 break;
+            case 4:
+                fname = argv[0];
+                System.out.println("Loading languages file: "+fname);
+                refresh_freq = Integer.parseInt(argv[1]);
+                threshold_freq = Integer.parseInt(argv[2]);
+                System.out.println("Using custom parameters");
+                nFile = argv[3];
+                System.out.println("Using custom Wiktionary dump: "+nFile);
+                break;
             default:
-                System.out.println("Number of arguments different from 0, 1 and 3: arguments ignored.");
+                System.out.println("Number of arguments different from 0, 1, 3 and 4: arguments ignored.");
                 System.out.println("The admissible arguments are:\n * languages_filename\n * languages_filename refresh_freq threshold_freq");
+                System.out.println(" * languages_filename refresh_freq threshold_freq wiktionary_dump");
                 System.out.println("examples:\n * java -jar ProgettoR1.jar lang.txt\n * java -jar ProgettoR1.jar lang.txt 200 4");
+                System.out.println(" * java -jar ProgettoR1.jar lang.txt 200 4 dump.xml");
                 break;
         }
         if (fname!=null) {
@@ -71,6 +82,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return;
     }
 
     private static List<String> loadLanguages(String lan_filename) {

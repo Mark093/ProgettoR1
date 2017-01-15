@@ -1,16 +1,16 @@
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by marco on 15/01/17.
  */
 public class OutputList {
-    private Map<String,OutputLang> outputs;
+    private List<OutputLang> outputs;
 
     public OutputList() {
-        outputs = new HashMap<>();
+        outputs = new ArrayList<>();
         if (Files.isDirectory(Paths.get("out"))) {
             System.out.println("The directory 'out' already exists");
         }
@@ -24,18 +24,20 @@ public class OutputList {
     }
 
     public void write(PrepTable words) {
-        String lang = words.getLanguage();
-        if (outputs.containsKey(lang)) {
-            //In this case we have already an output file to use
-            OutputLang outputobj = outputs.get(lang);
-            outputobj.writeFile(words);
+        String lang = new String(words.getLanguage());
+        for (OutputLang outobj : outputs) {
+            if (outobj.getLanguage().equalsIgnoreCase(lang)) {
+                System.out.println("Looking for files: "+lang+" found "+outobj.getLanguage());
+                System.out.println(outobj.getHFname());
+                outobj.writeFile(words);
+                return;
+            }
         }
-        else {
-            //New language: in this case we create a new file through the object OutputLang
-            OutputLang outputobj = new OutputLang(lang);
-            outputobj.writeFile(words);
-            outputs.put(lang,outputobj);
-        }
+        //New language: in this case we create a new file through the object OutputLang
+        OutputLang outputobj = new OutputLang(lang);
+        outputobj.writeFile(words);
+        outputs.add(outputobj);
+        return;
     }
 
 }
