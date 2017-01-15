@@ -21,9 +21,11 @@ public class HTMLParser {
 
     private static HeaderList headers;
     private static List<String> languages;
+    private static OutputList output;
 
-    public HTMLParser( Document doc, HeaderList headers, List<String> langs ) {
+    public HTMLParser( Document doc, HeaderList headers, List<String> langs, OutputList output) {
         this.headers=headers;
+        this.output=output;
         languages = langs;
         if (doc!=null)
             ParseText(doc);
@@ -60,7 +62,8 @@ public class HTMLParser {
                 if (allowedLang(getLanguage(table))) {
                     PrepTable p_table = ParseTable(table, word);
                     tableflag = true;
-                    //Todo: OUTPUT
+                    //Output
+                    output.write(p_table);
                 }
 			}
         }
@@ -84,7 +87,8 @@ public class HTMLParser {
                     if (allowedLang(getLanguage(l))) {
                         PrepTable p_table = ParseList(l, word);
                         listflag = true;
-                        //Todo: Output
+                        //Output
+                        output.write(p_table);
                     }
         		}
             }

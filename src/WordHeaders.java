@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 /**
  * Created by marco on 26/10/16.
  * in this class we store the headers:

@@ -23,6 +23,7 @@ public class TitlesHandler extends DefaultHandler {
     private HeaderList headers;
     private int refresh_freq;
     private List<String> languages;
+    private OutputList output;
 
 
     public TitlesHandler(int ref_freq, int thr_freq, List<String> languages) {
@@ -34,6 +35,7 @@ public class TitlesHandler extends DefaultHandler {
         refresh_freq=headers.getRefreshFreq();
         docChecked=new ArrayList<>(refresh_freq);
         docToCheck=new ArrayList<>(refresh_freq);
+        output = new OutputList();
         System.out.println("Starting parsing: refresh frequency: "+refresh_freq+", threshold frequency: "+headers.getThrFrequence());
     }
 
@@ -94,7 +96,7 @@ public class TitlesHandler extends DefaultHandler {
                         headers.printHeaders();
                         //parse the pages with the old set
                         for (Document page : docChecked) {
-                            HTMLParser hparser = new HTMLParser(page, headers, languages);
+                            HTMLParser hparser = new HTMLParser(page, headers, languages, output);
                         }
                         docChecked=docToCheck;
                         docToCheck=new ArrayList<>(refresh_freq);
@@ -110,10 +112,10 @@ public class TitlesHandler extends DefaultHandler {
     @Override
     public void endDocument() throws SAXException {
         for (Document page : docChecked) {
-            HTMLParser hparser = new HTMLParser(page, headers, languages);
+            HTMLParser hparser = new HTMLParser(page, headers, languages, output);
         }
         for (Document page : docToCheck) {
-            HTMLParser hparser = new HTMLParser(page, headers, languages);
+            HTMLParser hparser = new HTMLParser(page, headers, languages, output);
         }
     }
 

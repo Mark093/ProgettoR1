@@ -205,14 +205,6 @@ public class PrepTable {
 		usedcells.add(pair);
 	}
 
-	public List<Word> getWord() {
-		return word;
-	}
-
-	public void addWord(Word s_word) {
-		word.add(s_word);
-	}
-
 	public static Set<String> collapseHeaders(List<WordHeaders> hlist) {
 		Set<String> retlist = new TreeSet<>();
 		for (WordHeaders wh : hlist) {
@@ -234,6 +226,28 @@ public class PrepTable {
 			}
 		}
 		return retlist;
+	}
+
+	//Setters
+	public void addWord(Word s_word) {
+		word.add(s_word);
+	}
+
+	//Getters
+	public List<Word> getWords() {
+		return word;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public String getPos() {
+		return pos;
+	}
+
+	public String getTitle() {
+		return title;
 	}
     
 }
