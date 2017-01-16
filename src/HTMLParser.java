@@ -186,6 +186,8 @@ public class HTMLParser {
     //Get the POS of table content
     public static String getPOS(Element el, String lang) {
         boolean found=false;
+        ArrayList<String> allowedpos = new ArrayList<>(Arrays.asList("Noun", "Verb", "Adjective"));
+        String tag = "";
         String pos=new String("");
         Element divFrame=el;
         //Get the node at the same level of the XML tag with the language
@@ -195,21 +197,46 @@ public class HTMLParser {
         //Search the node containing the POS
         while (!found && divFrame!=null) {
             if (divFrame.tagName().equalsIgnoreCase("h3")||divFrame.tagName().equalsIgnoreCase("h4")||divFrame.tagName().equalsIgnoreCase("h5")) {
+                if (divFrame.tagName().equalsIgnoreCase("h3"))
+                    tag = "h2";
+                else {
+                    if (divFrame.tagName().equalsIgnoreCase("h4"))
+                        tag = "h3";
+                    else
+                        tag = "h4";
+                }
                 Element posel=divFrame.child(0);
                 if (posel.className().equalsIgnoreCase("mw-headline")) {
                     //Check if the POS found too is related to the table language
                     if (lang.equalsIgnoreCase(getLanguage(divFrame))) {
                         pos = posel.text();
                     }
-                    else {
-                        pos="POS language not matched";
-                    }
                     found = true;
                 }
             }
             divFrame = divFrame.previousElementSibling();
         }
-        return pos;
+        if (allowedPos(pos)) {
+            if (!allowedpos.contains(pos)) {
+                found = false;
+                while (!found && divFrame!=null) {
+                    if (divFrame.tagName().equalsIgnoreCase(tag)) {
+                        Element posel=divFrame.child(0);
+                        if (posel.className().equalsIgnoreCase("mw-headline")) {
+                            //Check if the POS found too is related to the table language
+                            if (lang.equalsIgnoreCase(getLanguage(divFrame))) {
+                                pos = posel.text();
+                            }
+                            found = true;
+                        }
+                    }
+                    divFrame = divFrame.previousElementSibling();
+                }
+            }
+        }
+        if (allowedpos.contains(pos))
+            return pos;
+        return "POS not allowed";
     }
 
     private static boolean allowedLang(String lang) {
