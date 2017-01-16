@@ -139,6 +139,7 @@ public class HTMLParser {
             if(el.hasClass("gender")){
                 String wh = el.text().replaceAll("\\s", " ").trim().toUpperCase();
                 inflectionWord = new Word(word,wh);
+                System.out.println(word + " " + wh);
             }
             else {
                 if (el.tag().isKnownTag("i")) {

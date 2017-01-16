@@ -95,7 +95,7 @@ public class PrepTable {
 						for (int j = 0; j < colsp; j++)
 							setUsed(r + i, c + j);
 					//Special case: the words with rowspan greater than one are ignored for now
-					if (!inflection.isEmpty() && !inflection.matches("-|—")) {
+					if (!inflection.isEmpty() && !inflection.matches("(-|—)+")) {
 						if (rowsp == 1) {
 							//create a Word element at the beginning without headers
 							Word word1 = new Word(inflection);
@@ -119,14 +119,14 @@ public class PrepTable {
 									Iterator<WordHeaders> coliterator = wordheads.iterator();
 									if (coliterator.hasNext()) {
 										wh = coliterator.next();
-										while (coliterator.hasNext() && wh.getColdistance() != 0) {
+										while (coliterator.hasNext() && !(wh.getColdistance() == 0 && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null || findHeaderList(wh.getRowdistance(), -1, wordheads) != null))) {
 											wh = coliterator.next();
 										}
 										if (wh.getColdistance() == 0) {
 											minwh = wh;
 											while (coliterator.hasNext()) {
 												wh = coliterator.next();
-												if (wh.getColdistance() == 0 && wh.getRowdistance() < minwh.getRowdistance())
+												if (wh.getColdistance() == 0 && wh.getRowdistance() < minwh.getRowdistance() && (findHeaderList(wh.getRowdistance(), 1, wordheads) != null || findHeaderList(wh.getRowdistance(), -1, wordheads) != null))
 													minwh = wh;
 											}
 											filteredcolheaders.add(minwh);
@@ -147,11 +147,15 @@ public class PrepTable {
 									while (count < 20 && wh == null) {
 										count++;
 										wh = findHeaderList(0, count, wordheads);
+										if (findHeaderList(1, count, wordheads)==null && findHeaderList(-1, count, wordheads)==null)
+											wh = null;
 									}
 									while (count < 20 && wh != null) {
 										count++;
 										filteredrowheaders.add(wh);
 										wh = findHeaderList(0, count, wordheads);
+										if (findHeaderList(1, count, wordheads)==null && findHeaderList(-1, count, wordheads)==null)
+											wh = null;
 									}
 									//Step 3: get the corner headers by using the obtained two lists... and add all in the word list
 									List<WordHeaders> filteredcornheaders = new ArrayList<>();

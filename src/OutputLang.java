@@ -18,8 +18,8 @@ public class OutputLang {
     public OutputLang(String lang) {
         language = new String(lang);
         headers = new ArrayList<>();
-        headersfname = new String("out/headers_"+lang+".txt");
-        wordsfname = new String("out/table_"+lang+".txt");
+        headersfname = new String("out/"+lang+"_headers.txt");
+        wordsfname = new String("out/"+lang+"_table.txt");
         File file = new File(headersfname);
         if (file.exists())
             file.delete();

@@ -79,7 +79,7 @@ public class HeaderList {
                             for (Element cell : cells) {
                                 if (cell.hasText()) {
                                     String celltext = cell.text().replaceAll("\\s", " ").trim().toUpperCase();
-                                    if (!celltext.isEmpty() && !celltext.matches("-|—")) {
+                                    if (!celltext.isEmpty() && !celltext.matches("(-|—)+")) {
                                         if (!headers.containsKey(celltext)) {
                                             headers.put(celltext, new Integer(1));
                                         }
