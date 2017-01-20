@@ -1,4 +1,3 @@
-import javafx.util.Pair;
 import org.jsoup.nodes.Element;
 
 import java.util.*;
@@ -15,7 +14,7 @@ public class PrepTable {
     private static Element table;
     private static List<Word> word;
 	private static HeaderList headers;
-	private static List<Pair<Integer, Integer>> usedcells;
+	private static List<Pair> usedcells;
 
     public PrepTable(Element table, String title, String language, String pos, HeaderList headers) {
     	this.table = table;
@@ -198,15 +197,15 @@ public class PrepTable {
 	}
 
 	private static boolean isUsed(int row, int col) {
-		for (Pair<Integer, Integer> pair : usedcells) {
-			if (pair.getKey().intValue()==row && pair.getValue().intValue()==col)
+		for (Pair pair : usedcells) {
+			if (pair.getKey()==row && pair.getValue()==col)
 				return true;
 		}
 		return false;
 	}
 
 	private static void setUsed(int row, int col) {
-		Pair<Integer,Integer> pair = new Pair<>(row,col);
+		Pair pair = new Pair(row,col);
 		usedcells.add(pair);
 		return;
 	}
