@@ -17,6 +17,8 @@ public class TitlesHandler extends DefaultHandler {
 
     private boolean title=false;
     private boolean startCheck=false;
+    private boolean hastostart = false;
+    private String startword = "";
     private List<Document> docChecked;
     private List<Document> docToCheck;
     private int counter;
@@ -31,6 +33,21 @@ public class TitlesHandler extends DefaultHandler {
         headers = new HeaderList(ref_freq, thr_freq, languages);
         this.languages = languages;
         startCheck=false;
+        hastostart = true;
+        counter=0;
+        refresh_freq=headers.getRefreshFreq();
+        docChecked=new ArrayList<>(refresh_freq);
+        docToCheck=new ArrayList<>(refresh_freq);
+        output = new OutputList();
+        System.out.println("Starting parsing: refresh frequency: "+refresh_freq+", threshold frequency: "+headers.getThrFrequence());
+    }
+
+    public TitlesHandler(int ref_freq, int thr_freq, List<String> languages, String startWord) {
+        super();
+        headers = new HeaderList(ref_freq, thr_freq, languages);
+        this.languages = languages;
+        startCheck=false;
+        this.startword = startWord;
         counter=0;
         refresh_freq=headers.getRefreshFreq();
         docChecked=new ArrayList<>(refresh_freq);
@@ -55,6 +72,8 @@ public class TitlesHandler extends DefaultHandler {
     public void characters(char ch[], int start, int length) throws SAXException {
         if (title) {
             String foundTitle = new String(ch, start, length);
+            if (!hastostart && foundTitle.equalsIgnoreCase(startword))
+                hastostart=true;
             //Check if it is a word that interest us or not and get infos
             /*
             * Here we made a lot of stuff:
@@ -65,7 +84,7 @@ public class TitlesHandler extends DefaultHandler {
              *  titles and the next refresh_freq (at least)
              *
             * */
-            if (!foundTitle.contains(":")) {
+            if (!foundTitle.contains(":") && hastostart) {
                 if (!startCheck) {
                     docChecked.add(loadPage(foundTitle));
                     counter++;

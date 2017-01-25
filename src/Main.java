@@ -27,6 +27,7 @@ public class Main {
         int refresh_freq = 400;
         int threshold_freq = 3;
         List<String> languages=null;
+        String startword = null;
 
         switch (argv.length) {
             case 0:
@@ -52,12 +53,25 @@ public class Main {
                 nFile = argv[3];
                 System.out.println("Using custom Wiktionary dump: "+nFile);
                 break;
+            case 5:
+                fname = argv[0];
+                System.out.println("Loading languages file: "+fname);
+                refresh_freq = Integer.parseInt(argv[1]);
+                threshold_freq = Integer.parseInt(argv[2]);
+                System.out.println("Using custom parameters");
+                nFile = argv[3];
+                System.out.println("Using custom Wiktionary dump: "+nFile);
+                startword = argv[4];
+                System.out.println("Starting from the word: "+startword);
+                break;
             default:
-                System.out.println("Number of arguments different from 0, 1, 3 and 4: arguments ignored.");
+                System.out.println("Number of arguments different from 0, 1, 3, and 5: arguments ignored.");
                 System.out.println("The admissible arguments are:\n * languages_filename\n * languages_filename refresh_freq threshold_freq");
                 System.out.println(" * languages_filename refresh_freq threshold_freq wiktionary_dump");
+                System.out.println(" * languages_filename refresh_freq threshold_freq wiktionary_dump start_word");
                 System.out.println("examples:\n * java -jar ProgettoR1.jar lang.txt\n * java -jar ProgettoR1.jar lang.txt 200 4");
                 System.out.println(" * java -jar ProgettoR1.jar lang.txt 200 4 dump.xml");
+                System.out.println(" * java -jar ProgettoR1.jar lang.txt 200 4 dump.xml mullein");
                 break;
         }
         if (fname!=null) {
@@ -72,7 +86,11 @@ public class Main {
         try {
             SAXParser parser = factory.newSAXParser();
             File file = new File(nFile);
-            TitlesHandler handler = new TitlesHandler(refresh_freq, threshold_freq, languages);
+            TitlesHandler handler;
+            if (startword == null)
+                handler = new TitlesHandler(refresh_freq, threshold_freq, languages);
+            else
+                handler = new TitlesHandler(refresh_freq, threshold_freq, languages, startword);
             parser.parse(file, handler);
         }
         catch (ParserConfigurationException e) {
