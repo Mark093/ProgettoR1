@@ -164,19 +164,21 @@ public class HTMLParser {
         if (element !=null) {
             //Get the node at the same level of the XML tag with the language
             Element divFrame = element;
-            while (!divFrame.parent().id().equalsIgnoreCase("mw-content-text")) {
+            while (divFrame.parent()!=null&&!divFrame.parent().id().equalsIgnoreCase("mw-content-text")) {
                 divFrame = divFrame.parent();
             }
-            //Search the node containing the language
-            while (!found && divFrame != null) {
-                if (divFrame.tagName().equalsIgnoreCase("h2")) {
-                    Element langel = divFrame.child(0);
-                    if (langel.className().equalsIgnoreCase("mw-headline")) {
-                        lang = langel.text();
-                        found = true;
+            if (divFrame.parent()!=null) {
+                //Search the node containing the language
+                while (!found && divFrame != null) {
+                    if (divFrame.tagName().equalsIgnoreCase("h2")) {
+                        Element langel = divFrame.child(0);
+                        if (langel.className().equalsIgnoreCase("mw-headline")) {
+                            lang = langel.text();
+                            found = true;
+                        }
                     }
+                    divFrame = divFrame.previousElementSibling();
                 }
-                divFrame = divFrame.previousElementSibling();
             }
         }
         return lang;
@@ -191,30 +193,32 @@ public class HTMLParser {
             String pos = new String("");
             Element divFrame = el;
             //Get the node at the same level of the XML tag with the language
-            while (!divFrame.parent().id().equalsIgnoreCase("mw-content-text")) {
+            while (divFrame.parent()!=null&&!divFrame.parent().id().equalsIgnoreCase("mw-content-text")) {
                 divFrame = divFrame.parent();
             }
-            //Search the node containing the POS
-            while (!found && divFrame != null) {
-                if (divFrame.tagName().equalsIgnoreCase("h3") || divFrame.tagName().equalsIgnoreCase("h4") || divFrame.tagName().equalsIgnoreCase("h5")) {
-                    if (divFrame.tagName().equalsIgnoreCase("h3"))
-                        tag = "h2";
-                    else {
-                        if (divFrame.tagName().equalsIgnoreCase("h4"))
-                            tag = "h3";
-                        else
-                            tag = "h4";
-                    }
-                    Element posel = divFrame.child(0);
-                    if (posel.className().equalsIgnoreCase("mw-headline")) {
-                        //Check if the POS found too is related to the table language
-                        if (lang.equalsIgnoreCase(getLanguage(divFrame))) {
-                            pos = posel.text();
+            if (divFrame.parent()!=null) {
+                //Search the node containing the POS
+                while (!found && divFrame != null) {
+                    if (divFrame.tagName().equalsIgnoreCase("h3") || divFrame.tagName().equalsIgnoreCase("h4") || divFrame.tagName().equalsIgnoreCase("h5")) {
+                        if (divFrame.tagName().equalsIgnoreCase("h3"))
+                            tag = "h2";
+                        else {
+                            if (divFrame.tagName().equalsIgnoreCase("h4"))
+                                tag = "h3";
+                            else
+                                tag = "h4";
                         }
-                        found = true;
+                        Element posel = divFrame.child(0);
+                        if (posel.className().equalsIgnoreCase("mw-headline")) {
+                            //Check if the POS found too is related to the table language
+                            if (lang.equalsIgnoreCase(getLanguage(divFrame))) {
+                                pos = posel.text();
+                            }
+                            found = true;
+                        }
                     }
+                    divFrame = divFrame.previousElementSibling();
                 }
-                divFrame = divFrame.previousElementSibling();
             }
             if (allowedPos(pos)) {
                 if (!allowedpos.contains(pos)) {
