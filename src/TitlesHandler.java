@@ -5,8 +5,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.*;
 
 /**
  * Created by marco on 21/10/16..
@@ -26,6 +28,9 @@ public class TitlesHandler extends DefaultHandler {
     private int refresh_freq;
     private List<String> languages;
     private OutputList output;
+    private int parsedpages = 0;
+    private Instant parsInit;
+    private final int totpages = 4810922;
 
 
     public TitlesHandler(int ref_freq, int thr_freq, List<String> languages) {
@@ -39,6 +44,7 @@ public class TitlesHandler extends DefaultHandler {
         docChecked=new ArrayList<>(refresh_freq);
         docToCheck=new ArrayList<>(refresh_freq);
         output = new OutputList();
+        parsInit = Instant.now();
         System.out.println("Starting parsing: refresh frequency: "+refresh_freq+", threshold frequency: "+headers.getThrFrequence());
     }
 
@@ -91,13 +97,21 @@ public class TitlesHandler extends DefaultHandler {
                     System.out.print("Loading Pages: "+counter+"/"+refresh_freq+"\r");
                     if (counter>=refresh_freq) {
                         System.out.println("First loading done");
+                        parsedpages+=refresh_freq;
                         startCheck=true;
                         //start the training of the header set
                         for (Document page : docChecked) {
                             headers.addTables(page);
                         }
                         counter=0;
+                        Instant now = Instant.now();
+                        Duration duration = Duration.between(parsInit,now);
+                        float minutes = ((float)duration.getSeconds())/((float)60);
+                        System.out.println("Already loaded "+parsedpages+" pages. "+refresh_freq+" pages parsed in "+minutes+" minutes.");
+                        float timeleft = (totpages-parsedpages)*minutes/(60*refresh_freq);
+                        System.out.println("Estimated remaining time: "+timeleft+" hours.");
                         //System.out.println();
+                        parsInit = now;
                     }
                 }
                 else {
@@ -105,7 +119,8 @@ public class TitlesHandler extends DefaultHandler {
                     counter++;
                     System.out.print("Loading Pages: "+counter+"/"+refresh_freq+"\r");
                     if (counter>=refresh_freq) {
-                        System.out.println("Loading done");
+                        parsedpages+=refresh_freq;
+                        System.out.println("Loading done: loaded "+parsedpages+" pages");
                         //train the header set with the new set
                         for (Document page : docToCheck) {
                             headers.addTables(page);
@@ -119,6 +134,14 @@ public class TitlesHandler extends DefaultHandler {
                         }
                         docChecked=docToCheck;
                         docToCheck=new ArrayList<>(refresh_freq);
+                        Instant now = Instant.now();
+                        Duration duration = Duration.between(parsInit,now);
+                        float minutes = ((float)duration.getSeconds())/((float)60);
+                        System.out.println("Already loaded "+parsedpages+" pages. "+refresh_freq+" pages parsed in "+minutes+" minutes.");
+                        float timeleft = (totpages-parsedpages)*minutes/(60*refresh_freq);
+                        System.out.println("Estimated remaining time: "+timeleft+" hours.");
+                        //System.out.println();
+                        parsInit = now;
                     }
                 }
             }
